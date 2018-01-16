@@ -21,6 +21,8 @@ for line in f.readlines():
     line = line.strip()
     temp = line.split(",")
     arr.append(temp)
+f.close()
+size = len(arr)
 
 # Define quicksort function    
 def quicksort(arr, rank, i, j):
@@ -56,4 +58,13 @@ def quicksort(arr, rank, i, j):
     quicksort(arr, rank, hi, j)
     return
 # Do the quicksort
-quicksort(arr, 2, 0, len(arr)-1)
+quicksort(arr, 2, 0, size-1)
+
+# Write file
+f = open("sorted.txt", 'w')
+for i in range(0, size):
+    for j in range(0, 2):
+        f.write(arr[i][j]+',')
+    f.write(arr[i][j+1]+'\n')
+
+f.close()
