@@ -5,16 +5,7 @@ Created on Sun Jan 14 19:33:27 2018
 
 @author: Jiawei Zhong
 """
-"""
-import csv
-with open('unsorted.txt') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        print(row)
- """
  # Open unsorted file and convert the data to 2D array
-import copy
-
 f = open("unsorted.txt")
 arr = []
 for line in f.readlines():
@@ -28,13 +19,15 @@ size = len(arr)
 def quicksort(arr, rank, i, j):
     if i >= j:
         return
+    if (i + 1 == j) and (int(arr[i][rank]) == int(arr[j][rank])):
+        return
     lo = i
     hi = j
     pivot = int(arr[hi][rank])
-    pivot_record = copy.deepcopy(arr[hi])
+    pivot_record = arr[hi][:]
 
     while lo < hi:
-        while lo < hi and int(arr[lo][rank]) < pivot:
+        while lo < hi and int(arr[lo][rank]) <= pivot:
             lo = lo + 1
         if lo == hi: # If arr is well partited
             break
