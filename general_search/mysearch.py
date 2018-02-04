@@ -421,4 +421,13 @@ commands = list()
 for line in open(filename):
     commands.append(line.strip())
     
-A_Star_Search('Ann Arbor', 'Detroit')
+if commands[2] == 'B':
+    Breadth_First_Search(commands[0], commands[1])
+elif commands[2] == 'D':
+    Depth_First_Search(commands[0], commands[1])
+elif commands[2] == 'I':
+    Iterative_Deepening_DFS(commands[0], commands[1])
+elif commands[2] == 'U':
+    Uniform_Cost_Search(commands[0], commands[1])
+else:
+    A_Star_Search(commands[0], commands[1])
