@@ -89,10 +89,13 @@ class PriorityQueue:
             return True
         else:
             return False
-        
-        
-        
-        
+    
+    def isContain(self, node):
+        for i in range(self.size):
+            if node.name == self.pq[i].name:
+                return True
+        return False
+
         
 def Breadth_First_Search(init, goal):
     nodes = rp.build_graph()
@@ -291,11 +294,12 @@ def Uniform_Cost_Search(init, goal):
         for i in range(len(parentNode.neighbors)):
             childNode = nodes.get(parentNode.neighbors[i].destination)
             if not childNode.name in closeList:
-                frontier.offer(childNode)
                 currCost = parentNode.neighbors[i].distance + parentNode.cost
                 if currCost < childNode.cost:
                     childNode.cost = currCost
                     childNode.parent = parentNode
+                if not frontier.isContain(childNode):
+                    frontier.offer(childNode)
             
     if isGoal:
         node = goalNode
@@ -371,11 +375,22 @@ def A_Star_Search(init, goal):
         for i in range(len(parentNode.neighbors)):
             childNode = nodes.get(parentNode.neighbors[i].destination)
             if not childNode.name in closeList:
-                frontier.offer(childNode)
+                
                 currCost = parentNode.neighbors[i].distance + parentNode.cost
+                phi_child = childNode.lat*math.pi/180
+                theta_child = childNode.lon*math.pi/180
+                child_x = math.cos(phi_child) * math.cos(theta_child) * R
+                child_y = math.cos(phi_child) * math.sin(theta_child) * R
+                child_z = math.sin(phi_child) * R
+                currHeu = math.sqrt(math.pow(goal_x-child_x,2)
+                    +math.pow(goal_y-child_y,2)+math.pow(goal_z-child_z,2))
+                childNode.heu = currHeu
+                
                 if currCost < childNode.cost:
                     childNode.cost = currCost
                     childNode.parent = parentNode
+                if not frontier.isContain(childNode):
+                    frontier.offer(childNode)
             
     if isGoal:
         node = goalNode
@@ -406,4 +421,4 @@ commands = list()
 for line in open(filename):
     commands.append(line.strip())
     
-Uniform_Cost_Search('Ann Arbor', 'Detroit')
+A_Star_Search('Ann Arbor', 'Detroit')
