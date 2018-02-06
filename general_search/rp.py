@@ -11,7 +11,7 @@ class Edge:
     def __init__(self, na, di):
         self.destination = na
         self.distance = di
-        
+
 class Node:
     def __init__(self, na):
         self.name = na

@@ -2,3 +2,4 @@
 2. dfs->ite<10 pop or just return cannot find?
 3. create a map, if already in, do not offer/push?
 4. theta phi..?
+5. homework points
