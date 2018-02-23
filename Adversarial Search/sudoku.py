@@ -80,7 +80,6 @@ def easy_fill(sudoku, d):
 
 
 def play_sudoku(sudoku, empty_slot):
-#    print(1)
     if empty_slot == 0:
         print(sudoku)
         return sudoku, True
@@ -130,7 +129,7 @@ def play_sudoku(sudoku, empty_slot):
                     continue
             else:
                 continue
-    return sudoku, True
+    return sudoku, valid
     
     
         
@@ -155,3 +154,8 @@ for i in range(9):
           empty_slot -= 1
 
 sudoku, valid = play_sudoku(sudoku, empty_slot)
+f = open('suoutput.csv', 'w')
+writer = csv.writer(f)
+for row in sudoku:
+    writer.writerow(row)
+f.close()
