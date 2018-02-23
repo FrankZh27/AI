@@ -26,62 +26,18 @@ def is_last_move(board):
     if count == 1:
         return True
     else:
-        return False
-# didn't finish
-def calculate_val(board):
-    val = 0
+        return False     
+
+def isOver(board):
     for i in range(3):
-        count_row = 0
-        count_col = 0
         for j in range(3):
-            if board[i][j] == 'o':
-                count_row += 1
-            if board[j][i] == 'o':
-                count_col += 1
-        if count_row == 3:
-            val += 100
-        elif count_row == 2:
-            val += 10
-        else:
-            val += 1
-        
-        if count_col == 3:
-            val += 100
-        elif count_col == 2:
-            val += 10
-        else:
-            val += 1
-    
-    count_cross = 0
-    for i in range(3):
-        if board[i][i] == 'o':
-            count_cross += 1
-    if count_cross == 3:
-        val += 100
-    elif count_cross == 2:
-        val +=10
-    else:
-        val += 1
-        
-    count_cross = 0
-    if (board[0][2] == 'o'):
-        count_cross += 1
-    if (board[1][1] == 'o'):
-        count_cross += 1
-    if (board[2][0] == 'o'):
-        count_cross += 1
-    if count_cross == 3:
-        val += 100
-    elif count_cross == 2:
-        val += 10
-    else:
-        val += 1
-    return val
-        
+            if board[i][j] == '-':
+                return False
+    return True
 
 def check_utility(board, label):
-    min_val = sys.maxsize
-    max_val = 0
+    min_val = 1
+    max_val = -1
     row = 0
     col = 0
     if (label == 'o'):
@@ -90,33 +46,48 @@ def check_utility(board, label):
                 if board[i][j] == '-':
                     board_copy = copy.deepcopy(board)
                     board_copy[i][j] = 'o'
-                    curr_val, curr_row, curr_col = check_utility(board_copy, 'x')
-                    if curr_val >= max_val:
+                    if isTerminated(board_copy):
+                        max_val = 1
                         row = i
                         col = j
-        return max_val, row, col
-    else:
-        if is_last_move(board):
-            board_copy = copy.deepcopy(board)
-            for i in range(3):
-                for j in range(3):
-                    if board_copy[i][j] == '-':
-                        board_copy[i][j] = 'x'
-                        row = i
-                        col = j
-            val = calculate_val(board_copy)
-            return val, row, col
-        else:
-            for i in range(3):
-                for j in range(3):
-                    if board[i][j] == '-':
-                        board_copy = copy.deepcopy(board)
-                        board_copy[i][j] = 'x'
-                        curr_val, curr_row, curr_col = check_utility(board_copy, 'o')
-                        if curr_val <= min_val:
+                        return 1, i, j
+                    else:
+                        if isOver(board_copy):
+                            max_val = 0
                             row = i
                             col = j
-            return min_val, row, col
+                            return 0, i, j
+                        else:
+                            curr_val, curr_row, curr_col = check_utility(board_copy, 'x')
+                            if curr_val > max_val:
+                                max_val = curr_val
+                                row = i
+                                col = j
+        return max_val, row, col
+    else:
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == '-':
+                    board_copy = copy.deepcopy(board)
+                    board_copy[i][j] = 'x'
+                    if isTerminated(board_copy):
+                        min_val = -1
+                        row = i
+                        col = j
+                        return -1, i, j
+                    else:
+                        if isOver(board_copy):
+                            min_val = 0
+                            row = i
+                            col = j
+                            return 0, i, j
+                        else:
+                            curr_val, curr_row, curr_col = check_utility(board_copy, 'o')
+                            if curr_val < min_val:
+                                min_val = curr_val
+                                row = i
+                                col = j
+        return min_val, row, col
 
 """
 def printboard(board):
@@ -131,7 +102,7 @@ def printboard(board):
         print(i)
         
 def move(board):    
-    val, row, col = check_utility(board, 'o')
+    val, row, col = check_utility(board, 'o') 
     board[row][col] = 'o'
     printboard(board)
     return board
@@ -173,12 +144,15 @@ board = generate_board()
 empty_slot = [[0]*3 for i in range(3)]
 plyx_win = False
 plyo_win = False
-
+"""
 random.seed(3);
 plyx_list = []
 for i in range(0,40):
     num = math.floor(9 * random.random())
     plyx_list.append(num)
+"""
+plyx_list = [1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8]
+
 
 curr_plyx_index = 0;
 plyx_row = plyx_list[curr_plyx_index]//3
