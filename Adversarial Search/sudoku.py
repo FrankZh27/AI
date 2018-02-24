@@ -7,41 +7,42 @@ Created on Thu Feb 22 18:37:03 2018
 """
 import csv
 import copy
+import sys
 
-def find_mindomain(sudoku, d):
+def find_mindomain(sudoku, domain):
     """find the domain with minimum length"""
-    minLen = 9
+    min_len = 9
     row = 0
     col = 0
     for i in range(9):
         for j in range(9):
-            if sudoku[i][j] == 0 and len(d[i][j]) <= minLen:
+            if sudoku[i][j] == 0 and len(domain[i][j]) <= min_len:
                 row = i
                 col = j
-                minLen = len(d[i][j])
+                min_len = len(domain[i][j])
     return row, col
 
-def k_consistency(sudoku, d, i, j):
+def k_consistency(sudoku, domain, i_row, j_col):
     """Apply k-consistency to reduce the domain at d[i][j]"""
-    row = d[i][j]
+    row = domain[i_row][j_col]
     for k in range(9):
-        if not k == j:
-            if (not sudoku[i][k] == 0) and (sudoku[i][k] in row):
-                row.remove(sudoku[i][k])
+        if not k == j_col:
+            if (not sudoku[i_row][k] == 0) and (sudoku[i_row][k] in row):
+                row.remove(sudoku[i_row][k])
 
     for k in range(9):
-        if not k == i:
-            if (not sudoku[k][j] == 0) and (sudoku[k][j] in row):
-                row.remove(sudoku[k][j])
+        if not k == i_row:
+            if (not sudoku[k][j_col] == 0) and (sudoku[k][j_col] in row):
+                row.remove(sudoku[k][j_col])
 
-    grid_x = i//3*3
-    grid_y = j//3*3
+    grid_x = i_row//3*3
+    grid_y = j_col//3*3
 
-    for m in range(grid_x, grid_x+3):
-        for n in range(grid_y, grid_y+3):
-            if not(m == i and n == j):
-                if (not sudoku[m][n] == 0) and (sudoku[m][n] in row):
-                    row.remove(sudoku[m][n])
+    for m_row in range(grid_x, grid_x+3):
+        for n_col in range(grid_y, grid_y+3):
+            if not(m_row == i_row and n_col == j_col):
+                if (not sudoku[m_row][n_col] == 0) and (sudoku[m_row][n_col] in row):
+                    row.remove(sudoku[m_row][n_col])
 
     return row
 
@@ -60,46 +61,58 @@ def is_valid_insert(sudoku, element, row, col):
     grid_x = row//3*3
     grid_y = col//3*3
 
-    for m in range(grid_x, grid_x+3):
-        for n in range(grid_y, grid_y+3):
-            if not(m == row and n == col):
-                if sudoku[m][n] == element:
+    for m_row in range(grid_x, grid_x+3):
+        for n_col in range(grid_y, grid_y+3):
+            if not(m_row == row and n_col == col):
+                if sudoku[m_row][n_col] == element:
                     return False
     return True
 
-def easy_fill(sudoku, d):
+def easy_fill(sudoku, domain):
     """fill the blanks already decided according to known numbers"""
     count = 0
     for i in range(9):
         for j in range(9):
-            if sudoku[i][j] == 0 and len(d[i][j]) == 1:
-                s = list(d[i][j])
-                if is_valid_insert(sudoku, s[0], i, j):
-                    sudoku[i][j] = s[0]
-                    d[i][j].remove(s[0])
+            if sudoku[i][j] == 0 and len(domain[i][j]) == 1:
+                number = list(domain[i][j])
+                if is_valid_insert(sudoku, number[0], i, j):
+                    sudoku[i][j] = number[0]
+                    domain[i][j].remove(number[0])
                     count += 1
                 else:
                     return sudoku, count, False
     return sudoku, count, True
 
+def write_file(sudoku):
+    """Write solution to csv file"""
+    file = open('suoutput.csv', 'w')
+    writer = csv.writer(file)
+    for row in sudoku:
+        writer.writerow(row)
+    file.close()
+    return
+
 def play_sudoku(sudoku, empty_slot):
     """Fill sudoku based on k-consistency"""
+    print(empty_slot)
     if empty_slot == 0:
         print(sudoku)
+        write_file(sudoku)
+        sys.exit()
         return sudoku, True
 
-    d = [['-']*9 for i in range(9)]
+    domain = [['-']*9 for i in range(9)]
     for i in range(9):
         for j in range(9):
-            d[i][j] = set({1, 2, 3, 4, 5, 6, 7, 8, 9})
+            domain[i][j] = set({1, 2, 3, 4, 5, 6, 7, 8, 9})
             if not sudoku[i][j] == 0:
-                d[i][j].clear()
+                domain[i][j].clear()
 
     count = -1
     valid = True
     filled = 0
     sudoku_copy = copy.deepcopy(sudoku)
-    d_copy = copy.deepcopy(d)
+    d_copy = copy.deepcopy(domain)
     while (count != 0) and valid:
         count = 0
         for i in range(9):
@@ -114,54 +127,59 @@ def play_sudoku(sudoku, empty_slot):
     else:
         if empty_slot - filled == 0:
             print(sudoku_copy)
+            write_file(sudoku_copy)
+            sys.exit()
             return sudoku_copy, True
 
         sudoku = copy.deepcopy(sudoku_copy)
-        d = copy.deepcopy(d_copy)
+        domain = copy.deepcopy(d_copy)
 
-        row, col = find_mindomain(sudoku, d)
-        l = list(d[row][col])
-        for element in l:
+        row, col = find_mindomain(sudoku, domain)
+        list_element = list(domain[row][col])
+        empty_slot = empty_slot - filled
+        for element in list_element:
             sudoku_copy = copy.deepcopy(sudoku)
-            d_copy = copy.deepcopy(d)
+            d_copy = copy.deepcopy(domain)
             if is_valid_insert(sudoku_copy, element, row, col):
                 sudoku_copy[row][col] = element
-                sudoku_copy, valid = play_sudoku(sudoku_copy, empty_slot-filled-1)
+                sudoku_copy, valid = play_sudoku(sudoku_copy, empty_slot - 1)
                 if valid:
                     sudoku = copy.deepcopy(sudoku_copy)
                 else:
+                    valid = False
                     continue
             else:
+                valid = False
                 continue
-    return sudoku, valid
+    return sudoku, False
 
 def main():
     """This is the main function"""
-    f = open('suinput.csv', 'r')
-    Csvfile = csv.reader(f)
+    file = open('suinput.csv', 'r')
+    csv_file = csv.reader(file)
     sudoku = []
-    for s in Csvfile:
+    for line in csv_file:
         for i in range(9):
-            s[i] = int(s[i])
-        sudoku.append(s)
-    f.close()
+            line[i] = int(line[i])
+        sudoku.append(line)
+    file.close()
 
     empty_slot = 81
-    d = [['-']*9 for i in range(9)]
+    domain = [['-']*9 for i in range(9)]
     for i in range(9):
         for j in range(9):
-            d[i][j] = set({1, 2, 3, 4, 5, 6, 7, 8, 9})
+            domain[i][j] = set({1, 2, 3, 4, 5, 6, 7, 8, 9})
             if not sudoku[i][j] == 0:
-                d[i][j].clear()
+                domain[i][j].clear()
                 empty_slot -= 1
 
     sudoku, valid = play_sudoku(sudoku, empty_slot)
     if valid:
-        f = open('suoutput.csv', 'w')
-        writer = csv.writer(f)
+        file = open('suoutput.csv', 'w')
+        writer = csv.writer(file)
         for row in sudoku:
             writer.writerow(row)
-        f.close()
+        file.close()
 
 if __name__ == "__main__":
     main()
