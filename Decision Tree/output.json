@@ -1,0 +1,24 @@
+{
+  "Pat": {
+    "Full": {
+      "Hun": {
+        "No": "No",
+        "Yes": {
+          "Type": {
+            "Burger": "Yes",
+            "French": "Yes",
+            "Italian": "No",
+            "Thai": {
+              "Fri": {
+                "No": "No",
+                "Yes": "Yes"
+              }
+            }
+          }
+        }
+      }
+    },
+    "None": "No",
+    "Some": "Yes"
+  }
+}
